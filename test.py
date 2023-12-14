@@ -9,5 +9,5 @@ with open('Ashley-Madison.txt', 'r', encoding='utf-8') as file2:
 common_words = set(content1) & set(content2)
 num_common_words = len(common_words)
 
-print(f"\nNumber of common words: {num_common_words}\n")
-print("Common words:", ', '.join(common_words))
+print(f"\nNombre de mots communs: {num_common_words}\n")
+print("Mots communs:", ', '.join(common_words))

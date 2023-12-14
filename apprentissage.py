@@ -9,7 +9,7 @@ with open('occurrences.txt', 'r') as fichier:
 
 # Permet de récupérer qu'un nomber fixe de ligne
 nbLine= 375852
-nbSample = 10000
+nbSample = 20000
 gap = int(nbLine/nbSample)
 lineToTake = gap
 
@@ -42,7 +42,7 @@ letter = linear(h.view(1, -1))
 probabilities = nn.functional.softmax(letter, dim=1)
 
 generated_letters = []
-for _ in range(10000):
+for _ in range(20000):
     sampled_char_index = torch.multinomial(probabilities, 1).item()
     sampled_char = characters[sampled_char_index]
     generated_letters.append(sampled_char)
