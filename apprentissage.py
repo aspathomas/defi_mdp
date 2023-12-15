@@ -9,7 +9,7 @@ with open('occurrences.txt', 'r') as fichier:
 
 # Permet de récupérer qu'un nomber fixe de ligne
 nbLine= 375852
-nbSample = 20000
+nbSample = 100000
 gap = int(nbLine/nbSample)
 lineToTake = gap
 
@@ -36,16 +36,15 @@ rnn = nn.RNN(3, 10, batch_first=True)
 out, h = rnn(out)
 
 linear = nn.Linear(10, len(characters))
-# Apply the linear layer to the hidden state
+
 letter = linear(h.view(1, -1)) 
 
 probabilities = nn.functional.softmax(letter, dim=1)
 
-generated_letters = []
-for _ in range(20000):
-    sampled_char_index = torch.multinomial(probabilities, 1).item()
-    sampled_char = characters[sampled_char_index]
-    generated_letters.append(sampled_char)
+# Generate letters
+with torch.no_grad():
+    sampled_char_indices = torch.multinomial(probabilities, 1000000, replacement=True).squeeze()
+    generated_letters = [characters[idx] for idx in sampled_char_indices]
 
 with open('mdpTrouve.txt', 'w') as resultat:
     for caractere in generated_letters:
