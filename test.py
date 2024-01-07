@@ -1,6 +1,10 @@
 # Read the content of both files
 with open('mdpTrouve.txt', 'r', encoding='utf-8') as file1:
     content1 = file1.read().lower().split()
+    
+# Display total words in file1
+total_words_file1 = len(content1)
+print(f"Total de mots de passe : {total_words_file1}\n")
 
 with open('Ashley-Madison.txt', 'r', encoding='utf-8') as file2:
     content2 = file2.read().lower().split()

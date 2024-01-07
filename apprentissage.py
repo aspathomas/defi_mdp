@@ -24,25 +24,32 @@ with open('Ashley-Madison.txt', 'r') as fichier:
 
 l = [characters.index(char) for char in motDePasse if char in characters]
 
-emb = nn.Embedding(len(characters), 3)
-rnn = nn.RNN(3, 10, batch_first=True)
-linear = nn.Linear(10, len(characters))
+nb_neuronne = 25
+nb_neuronne_cacher = 50
+nb_couche = 5
+
+
+emb = nn.Embedding(len(characters), nb_neuronne)
+rnn = nn.RNN(nb_neuronne, nb_neuronne_cacher, batch_first=True)
+linear = nn.Linear(nb_neuronne_cacher, len(characters))
+
+# ajoute des couches rnn
+rnn_layers = nn.ModuleList([nn.RNN(nb_neuronne_cacher, nb_neuronne_cacher, batch_first=True) for _ in range(nb_couche)])
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(list(emb.parameters()) + list(rnn.parameters()) + list(linear.parameters()), lr=0.001)
 
-num_epochs = 5
+num_epochs = 10
 
 # Boucle d'entraînement
 for epoch in range(num_epochs):
     print(f'Epoch {epoch + 1}/{num_epochs}')
 
     # Réinitialisation de l'état caché pour chaque époque
-    h = torch.zeros(1, 1, 10)
+    h = torch.zeros(nb_couche, 1, nb_neuronne_cacher)
     
     correct_predictions = 0
     total_predictions = 0
-
     # Itérer à travers vos données
     for i in range(len(l)-1):
         input_index = l[i]
@@ -55,6 +62,9 @@ for epoch in range(num_epochs):
 
         out = emb(input_tensor)
         out, h = rnn(out)
+
+        for rnn_layer in rnn_layers:
+            out, h = rnn_layer(out)
         logits = linear(h.view(1, -1))
 
         loss = criterion(logits, target_tensor)
