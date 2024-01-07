@@ -39,6 +39,9 @@ for epoch in range(num_epochs):
 
     # Réinitialisation de l'état caché pour chaque époque
     h = torch.zeros(1, 1, 10)
+    
+    correct_predictions = 0
+    total_predictions = 0
 
     # Itérer à travers vos données
     for i in range(len(l)-1):
@@ -58,6 +61,16 @@ for epoch in range(num_epochs):
 
         loss.backward()
         optimizer.step()
+        
+        # Suivi des prédictions correctes
+        _, predicted_indices = torch.max(logits, 1)
+        correct_predictions += (predicted_indices == target_tensor).sum().item()
+        total_predictions += target_tensor.size(0)
+
+    # Calculer et imprimer le pourcentage de prédictions correctes
+    accuracy_percentage = (correct_predictions / total_predictions) * 100
+    print(f'Accuracy: {accuracy_percentage:.2f}%')
+
 
 
 # Sauvegarder le modèle
@@ -68,7 +81,7 @@ torch.save({
 }, 'mdp.pth')
 
 # Générer des lettres
-nb_letter = 100000
+nb_letter = 10000
 with torch.no_grad():
     sampled_char_indices = torch.zeros(nb_letter, dtype=torch.long)
     current_index = l[0]
