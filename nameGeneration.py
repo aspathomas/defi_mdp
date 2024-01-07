@@ -72,9 +72,7 @@ def readLines(filename):
         return [unicodeToAscii(line.strip().lower()) for line in some_file]
 
 
-filename = 'data/names/Russian.txt'
-filenameTrain = 'data/RussianTrain.txt'
-filenameTest = 'data/RussianTest.txt'
+filename = 'Ashley-Madison.txt'
 
 
 def getLines(f):
@@ -90,7 +88,8 @@ def split(rate, lines):
     for letter in string.ascii_letters:
         names_letter = []
         for line in lines:
-            if line[0] == letter:
+            print(line)
+            if len(line) > 0 and line[0] == letter:
                 names_letter.append(line)
         if len(names_letter) > 0:
             names.append(names_letter)
@@ -109,13 +108,13 @@ def split(rate, lines):
         names_traing.append(training)
         names_testing.append(testing)
 
-    f = open(filenameTrain, "w")
+    f = open(filename, "w")
     for names_letter in names_traing:
         for names in names_letter:
             f.write(names + "\n")
     f.close()
 
-    f = open(filenameTest, "w")
+    f = open(filename, "w")
     for names_letter in names_testing:
         for names in names_letter:
             f.write(names + "\n")
@@ -202,53 +201,6 @@ def timeSince(since):
     m = math.floor(s / 60)
     s -= m * 60
     return '%dm %ds' % (m, s)
-
-
-class RNNLight(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super(RNNLight, self).__init__()
-
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.n_layers = n_layers
-
-        self.bidirectional = bidirectional
-        self.num_directions = 1
-        if self.bidirectional:
-            self.num_directions = 2
-
-        self.rnn = nn.RNN(input_size=self.input_size, hidden_size=self.hidden_size, num_layers=1,
-                          bidirectional=self.bidirectional, batch_first=True)
-        self.out = nn.Linear(self.num_directions * self.hidden_size, output_size)
-
-        self.dropout = nn.Dropout(0.1)
-        self.softmax = nn.LogSoftmax(dim=1)
-
-    def forward(self, input, hidden):
-        _, hidden = self.rnn(input.unsqueeze(0), hidden)
-
-        hidden_concatenated = hidden
-
-        if self.bidirectional:
-            hidden_concatenated = torch.cat((hidden[0], hidden[1]), 1)
-        else:
-            hidden_concatenated = hidden.squeeze(0)
-
-        output = self.out(hidden_concatenated)
-
-        output = self.dropout(output)
-        output = self.softmax(output)
-
-        return output, hidden
-
-    def init_hidden(self):
-        return torch.zeros(self.num_directions, 1, self.hidden_size)
-
-    # return Variable(torch.zeros(self.n_layers, 1, self.hidden_size, device=device))
-
-    def init_hidden_random(self):
-        return torch.rand(self.num_directions, 1, self.hidden_size)
-    # return Variable(torch.zeros(self.n_layers, 1, self.hidden_size, device=device))
 
 
 class RNN(nn.Module):
@@ -509,14 +461,14 @@ if __name__ == '__main__':
 
     parser = ArgumentParser()
     #
-    parser.add_argument("-d", "--trainingData", default="data/shakespeare.txt", type=str,
+    parser.add_argument("-d", "--trainingData", default="Ashley-Madison.txt", type=str,
                         help="trainingData [path/to/the/data]")
     parser.add_argument("-te", "--trainEval", default='train', type=str, help="trainEval [train, eval, test]")
     #
     parser.add_argument("-r", "--run", default="rnnGeneration", type=str, help="name of the model saved file")
     # parser.add_argument("-mt", "--modelTraining", default='models', type=str, help="Path of the model to save (train) [path/to/the/model]")
     # parser.add_argument("-me", "--modelEval", default='models', type=str, help="Name of the model to load (eval) [path/to/the/model]")
-    parser.add_argument("-m", "--model", default='models/rnn.pt', type=str,
+    parser.add_argument("-m", "--model", default='rnn.pt', type=str,
                         help="Path of the model to save for trainingof to load for evaluating/testing (eval/test) [path/to/the/model]")
     #
     parser.add_argument('--n', default=10000, type=int,
@@ -543,9 +495,9 @@ if __name__ == '__main__':
     lines = getLines(filename)
     train_set, test_set = split(args.s, lines)
 
-    print('filenameTrain: ', filenameTrain)
-    lineTraining = getLines(filenameTrain)
-    lineTest = getLines(filenameTest)
+    print('filename: ', filename)
+    lineTraining = getLines(filename)
+    lineTest = getLines(filename)
 
     print('lineTraining: ', len(lineTraining))
     print('lineTest: ', len(lineTest))
@@ -555,7 +507,7 @@ if __name__ == '__main__':
     else:
         max_length = getMeanSize(lineTraining)
 
-    decoder = RNNLight(n_letters, 128, n_letters).to(
+    decoder = RNN(n_letters, 128, n_letters).to(
         device)  # RNN(n_characters, args.hidden_size, n_characters, args.num_layers).to(device)
     decoder_optimizer = torch.optim.Adam(decoder.parameters(), lr=lr)
 
