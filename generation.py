@@ -1,9 +1,10 @@
 import torch
 import torch.nn as nn
+import sys
 
 characters = []
 characters.append('€')
-with open('occurrences.txt', 'r') as fichier:
+with open('apprentissage/occurrences.txt', 'r') as fichier:
     for ligne in fichier:
         characters.append(ligne[0])
 
@@ -19,7 +20,7 @@ emb.load_state_dict(model['emb'])
 rnn.load_state_dict(model['rnn'])
 linear.load_state_dict(model['linear'])
 
-nb_letter = 1000
+nb_letter = int(sys.argv[1])
 generated_letters = []
 
 for current_index in range(30):
@@ -37,8 +38,7 @@ for current_index in range(30):
 
         generated_letters += [characters[idx] for idx in sampled_char_indices]
 
-# Save the generated letters to a file
-with open('mdpTrouve.txt', 'w') as resultat:
+with open(sys.argv[2] + '.txt', 'w') as resultat:
     for caractere in generated_letters:
         if caractere == '€':
             resultat.write('\n')

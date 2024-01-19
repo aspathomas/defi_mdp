@@ -1,5 +1,5 @@
 
-with open('Ashley-Madison.txt', 'r') as fichier:
+with open('train.txt', 'r') as fichier:
     occurrences = {}
     for ligne in fichier:
         for caractere in ligne:

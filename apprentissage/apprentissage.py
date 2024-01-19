@@ -8,19 +8,11 @@ with open('occurrences.txt', 'r') as fichier:
     for ligne in fichier:
         characters.append(ligne[0])
 
-# Permet de récupérer qu'un nomber fixe de ligne
-nbLine= 375852
-nbSample = 1000
-gap = int(nbLine/nbSample)
-lineToTake = gap
-
 motDePasse = ''
-with open('Ashley-Madison.txt', 'r') as fichier:
+with open('train.txt', 'r') as fichier:
     for count, ligne in enumerate(fichier):
-        if count == lineToTake:
-            ligne = ligne.rstrip('\n')
-            motDePasse += ligne + '€'
-            lineToTake += gap
+        ligne = ligne.rstrip('\n')
+        motDePasse += ligne + '€'
 
 l = [characters.index(char) for char in motDePasse if char in characters]
 
@@ -38,7 +30,7 @@ rnn_layers = nn.ModuleList([nn.RNN(nb_neuronne_cacher, nb_neuronne_cacher, batch
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(list(emb.parameters()) + list(rnn.parameters()) + list(linear.parameters()), lr=0.001)
 
-num_epochs = 3
+num_epochs = 7
 
 # Boucle d'entraînement
 for epoch in range(num_epochs):
