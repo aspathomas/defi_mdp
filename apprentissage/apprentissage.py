@@ -1,20 +1,32 @@
 import torch
+import random
 import torch.nn as nn
 import torch.optim as optim
 
+# récupérer les caractères
 characters = []
 characters.append('€')
 with open('occurrences.txt', 'r') as fichier:
     for ligne in fichier:
         characters.append(ligne[0])
-
-motDePasse = ''
+        
+# récupérer les mots de passe
+motDePasse = []
 with open('train.txt', 'r') as fichier:
-    for count, ligne in enumerate(fichier):
-        ligne = ligne.rstrip('\n')
-        motDePasse += ligne + '€'
+    for ligne in fichier:
+        motDePasse.append(ligne)
 
-l = [characters.index(char) for char in motDePasse if char in characters]
+# Mélanger les mot de passes
+random.shuffle(motDePasse)
+
+# Changer le tableau de mots passe en chaîne de caractère
+randomMpd = ''
+for count, ligne in enumerate(motDePasse):
+    ligne = ligne.rstrip('\n')
+    randomMpd += ligne + '€'
+
+# changer la chaine de caractère obtenue en tableau de chiffres pour l'apprentissage
+l = [characters.index(char) for char in randomMpd if char in characters]
 
 nb_neuronne = 50
 nb_neuronne_cacher = 100
